@@ -1,0 +1,13 @@
+POST http://localhost:8080/game/e50e5b1b-0e66-4e5e-aaf5-f11d9f6508b0
+Content-Type: application/json
+
+{
+  "id":  "e50e5b1b-0e66-4e5e-aaf5-f11d9f6508b0" ,
+  "board": {
+    "matrix": [
+      [2, 2, 1],
+      [1, 1, 2],
+      [2, 2, 1]
+    ]
+  }
+}

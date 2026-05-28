@@ -1,0 +1,62 @@
+package school.datasource.model;
+
+public class Board {
+    private static final int row = 3;
+    private static final int col = 3;
+    private final int[][] matrix;
+
+    public Board() {
+        matrix = new int[row][col];
+    }
+
+    public Board(int[][] matrix) {
+        if (checkMatrix(matrix)) {
+            this.matrix = copyMatrix(matrix);
+        } else {
+            throw new IllegalArgumentException("Incorrect matrix");
+        }
+    }
+
+    public int[][] getMatrix() {
+        int[][] tempMatrix = new int[row][col];
+        tempMatrix = copyMatrix(matrix);
+        return tempMatrix;
+    }
+
+    private boolean checkMatrix(int[][] matrix) {
+        if (matrix == null) {
+            return false;
+        }
+        if (matrix.length != row) {
+            return false;
+        }
+        for (int i = 0; i < matrix.length; i++) {
+            if (matrix[i] != null) {
+                if (col != matrix[i].length) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (matrix[i][j] != 0 && matrix[i][j] != 1 && matrix[i][j] != 2) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private int[][] copyMatrix(int[][] matrix) {
+        int[][] tempMatrix = new int[row][col];
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                tempMatrix[i][j] = matrix[i][j];
+            }
+        }
+        return tempMatrix;
+    }
+
+}
