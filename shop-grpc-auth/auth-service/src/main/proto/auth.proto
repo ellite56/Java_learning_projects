@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package school21.auth;
+
+option java_multiple_files = true;
+option java_package = "school21.auth.grpc";
+
+service Auth {
+  rpc Register(RegisterRequest) returns (TokenResponse);
+  rpc Login(LoginRequest) returns (TokenResponse);
+  rpc VerifyToken(VerifyTokenRequest) returns (VerifyTokenResponse);
+  rpc ChangePassword(ChangePasswordRequest) returns (Empty);
+  rpc ResetPassword(ResetPasswordRequest) returns (Empty);
+}
+
+message RegisterRequest {
+  string name = 1;
+  string surname = 2;
+  string phone = 3;
+  string login = 4;
+  string password = 5;
+}
+
+message LoginRequest {
+  string login = 1;
+  string password = 2;
+}
+
+message TokenResponse {
+  string token = 1;
+}
+
+message VerifyTokenRequest {
+  string token = 1;
+}
+
+message VerifyTokenResponse {
+  bool valid = 1;
+  string user_id = 2;
+}
+
+message ChangePasswordRequest {
+  string token = 1;
+  string current_password = 2;
+  string new_password = 3;
+}
+
+message ResetPasswordRequest {
+  string login = 1;
+}
+
+message Empty {}

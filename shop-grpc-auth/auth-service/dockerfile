@@ -1,0 +1,36 @@
+# -------------------------------------------------------------
+# Stage 1: Build JAR and extract Spring Boot layers
+# -------------------------------------------------------------
+FROM eclipse-temurin:18-jdk AS builder
+WORKDIR /workspace
+
+COPY gradlew settings.gradle build.gradle ./
+COPY gradle ./gradle
+RUN chmod +x gradlew && ./gradlew dependencies --no-daemon || true
+
+COPY src ./src
+RUN ./gradlew bootJar --no-daemon -x test && \
+  cp build/libs/*.jar app.jar && \
+  (java -Djarmode=tools -jar app.jar extract --layers --destination extracted 2>/dev/null || \
+  java -Djarmode=layertools -jar app.jar extract --destination extracted)
+
+# -------------------------------------------------------------
+# Stage 2: Minimal Runtime
+# -------------------------------------------------------------
+FROM eclipse-temurin:18-jre AS runtime
+WORKDIR /app
+
+RUN groupadd -r spring && useradd -r -g spring spring
+USER spring:spring
+
+COPY --from=builder --chown=spring:spring /workspace/extracted/dependencies/ ./
+COPY --from=builder --chown=spring:spring /workspace/extracted/spring-boot-loader/ ./
+COPY --from=builder --chown=spring:spring /workspace/extracted/snapshot-dependencies/ ./
+COPY --from=builder --chown=spring:spring /workspace/extracted/application/ ./
+
+EXPOSE 8080
+
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar \"$@\"", "_"]
+CMD []
